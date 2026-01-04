@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>֎🇦🇮 Rakshak - Vulnerabilities</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Orbitron:wght@500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles/main.css">
+    <style>
+        .vulnerability-filters {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+        
+        .filter-chip {
+            padding: 0.5rem 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .filter-chip:hover,
+        .filter-chip.active {
+            background: var(--primary);
+            border-color: var(--primary);
+        }
+        
+        .vulnerability-details {
+            display: none;
+            margin-top: 2rem;
+        }
+        
+        .vulnerability-details.active {
+            display: block;
+        }
+        
+        .detail-section {
+            margin-bottom: 2rem;
+        }
+        
+        .detail-section h3 {
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .code-block {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
+            padding: 1rem;
+            overflow-x: auto;
+            font-family: monospace;
+        }
+        
+        .solution-steps {
+            list-style-type: decimal;
+            padding-left: 1.5rem;
+        }
+        
+        .solution-steps li {
+            margin-bottom: 0.5rem;
+        }
+        
+        .severity-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 0.5rem;
+        }
+        
+        .severity-indicator.critical {
+            background: #ff3e41;
+            box-shadow: 0 0 10px #ff3e41;
+        }
+        
+        .severity-indicator.high {
+            background: #ff9800;
+            box-shadow: 0 0 10px #ff9800;
+        }
+        
+        .severity-indicator.medium {
+            background: #ffc107;
+            box-shadow: 0 0 10px #ffc107;
+        }
+        
+        .severity-indicator.low {
+            background: #4caf50;
+            box-shadow: 0 0 10px #4caf50;
+        }
+        
+        .vuln-impact {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            background: rgba(255, 62, 65, 0.1);
+            color: #ff3e41;
+            border-radius: 4px;
+            margin: 0.5rem 0;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="logo">
+            <img src="https://via.placeholder.com/40x40" alt="Rakshak Logo">
+            <span class="logo-text">RAKSHAK</span>
+        </div>
+        <ul class="nav-menu">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="dashboard.html">Dashboard</a></li>
+            <li><a href="scanner.html">Scanner</a></li>
+            <li><a href="reports.html">Reports</a></li>
+            <li><a href="vulnerabilities.html" class="active">Vulnerabilities</a></li>
+        </ul>
+        <div class="user-menu">
+            <div class="user-avatar">
+                <img src="https://via.placeholder.com/40x40" alt="User Avatar">
+            </div>
+            <div class="user-info">
+                <span class="user-name">Kundan Kumar</span>
+                <span class="user-role">Security Analyst</span>
+            </div>
+            <div class="dropdown">
+                <i class="fas fa-chevron-down"></i>
+                <div class="dropdown-menu">
+                    <a href="#"><i class="fas fa-user"></i> Profile</a>
+                    <a href="#"><i class="fas fa-cog"></i> Settings</a>
+                    <a href="#"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <ul class="sidebar-menu">
+            <li class="sidebar-item">
+                <a href="dashboard.html" class="sidebar-link">
+                    <i class="fas fa-home"></i>
+                    <span>Overview</span>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a href="scanner.html" class="sidebar-link">
+                    <i class="fas fa-search"></i>
+                    <span>Security Scanner</span>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a href="vulnerabilities.html" class="sidebar-link active">
+                    <i class="fas fa-bug"></i>
+                    <span>Vulnerabilities</span>
+                    <span class="badge badge-critical">3</span>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a href="reports.html" class="sidebar-link">
+                    <i class="fas fa-chart-bar"></i>
+                    <span>Reports</span>
+                </a>
+            </li>
+        </ul>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="page-header">
+            <h1>Vulnerabilities Database</h1>
+            <p>Browse and manage discovered security vulnerabilities</p>
+        </div>
+
+        <!-- Filters -->
+        <div class="vulnerability-filters">
+            <div class="filter-chip active" onclick="filterVulns('all')">All</div>
+            <div class="filter-chip" onclick="filterVulns('critical')">
+                <span class="severity-indicator critical"></span> Critical
+            </div>
+            <div class="filter-chip" onclick="filterVulns('high')">
+                <span class="severity-indicator high"></span> High
+            </div>
+            <div class="filter-chip" onclick="filterVulns('medium')">
+                <span class="severity-indicator medium"></span> Medium
+            </div>
+            <div class="filter-chip" onclick="filterVulns('low')">
+                <span class="severity-indicator low"></span> Low
+            </div>
+            <div class="filter-chip" onclick="filterVulns('fixed')">Fixed</div>
+            <div class="filter-chip" onclick="filterVulns('open')">Open</div>
+        </div>
+
+        <!-- Search -->
+        <div class="form-group">
+            <input type="text" class="form-control" placeholder="Search vulnerabilities..." id="searchVulns">
+        </div>
+
+        <!-- Vulnerabilities List -->
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title">Detected Vulnerabilities</h2>
+                <div class="vuln-count">
+                    <span class="badge badge-critical">3 Critical</span>
+                    <span class="badge badge-high">5 High</span>
+                    <span class="badge badge-medium">12 Medium</span>
+                </div>
+            </div>
+            
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Vulnerability</th>
+                            <th>Severity</th>
+                            <th>Location</th>
+                            <th>Status</th>
+                            <th>Discovered</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="vuln-row critical" data-vuln="sqli">
+                            <td>VULN-001</td>
+                            <td>SQL Injection</td>
+                            <td><span class="badge badge-critical">Critical</span></td>
+                            <td>/api/login.php</td>
+                            <td><span class="badge badge-danger">Open</span></td>
+                            <td>2 hours ago</td>
+                            <td>
+                                <button class="btn btn-sm btn-outline" onclick="showVulnDetails('sqli')">Details</button>
+                                <button class="btn btn-sm btn-danger">Fix</button>
+                            </td>
+                        </tr>
+                        <tr class="vuln-row high" data-vuln="xss">
+                            <td>VULN-002</td>
+                            <td>Cross-Site Scripting (XSS)</td>
+                            <td><span class="badge badge-high">High</span></td>
+                            <td>/search.php?q=</td>
+                            <td><span class="badge badge-danger">Open</span></td>
+                            <td>5 hours ago</td>
+                            <td>
+                                <button class="btn btn-sm btn-outline" onclick="showVulnDetails('xss')">Details</button>
+                                <button class="btn btn-sm btn-danger">Fix</button>
+                            </td>
+                        </tr>
+                        <tr class="vuln-row critical" data-vuln="rce">
+                            <td>VULN-003</td>
+                            <td>Remote Code Execution</td>
+                            <td><span class="badge badge-critical">Critical</span></td>
+                            <td>/upload.php</td>
+                            <td><span class="badge badge-danger">Open</span></td>
+                            <td>1 day ago</td>
+                            <td>
+                                <button class="btn btn-sm btn-outline" onclick="showVulnDetails('rce')">Details</button>
+                                <button class="btn btn-sm btn-danger">Fix</button>
+                            </td>
+                        </tr>
+                        <tr class="vuln-row medium" data-vuln="csrf">
+                            <td>VULN-004</td>
+                            <td>CSRF Vulnerability</td>
+                            <td><span class="badge badge-medium">Medium</span></td>
+                            <td>/admin/update.php</td>
+                            <td><span class="badge badge-info">Fixed</span></td>
+                            <td>2 days ago</td>
+                            <td>
+                                <button class="btn btn-sm btn-outline" onclick="showVulnDetails('csrf')">Details</button>
+                                <button class="btn btn-sm btn-primary">Verify</button>
+                            </td>
+                        </tr>
+                        <tr class="vuln-row low" data-vuln="info">
+                            <td>VULN-005</td>
+                            <td>Information Disclosure</td>
+                            <td><span class="badge badge-low">Low</span></td>
+                            <td>HTTP Headers</td>
+                            <td><span class="badge badge-danger">Open</span></td>
+                            <td>3 days ago</td>
+                            <td>
+                                <button class="btn btn-sm btn-outline" onclick="showVulnDetails('info')">Details</button>
+                                <button class="btn btn-sm btn-danger">Fix</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Vulnerability Details -->
+        <div class="card vulnerability-details" id="vulnDetails">
+            <div class="card-header">
+                <h2 class="card-title" id="vulnTitle">Vulnerability Details</h2>
+                <button class="btn btn-outline" onclick="hideVulnDetails()">Close</button>
+            </div>
+            
+            <div class="detail-section">
+                <h3>Description</h3>
+                <p id="vulnDescription"></p>
+                <div class="vuln-impact" id="vulnImpact"></div>
+            </div>
+            
+            <div class="detail-section">
+                <h3>Location</h3>
+                <p><strong>File:</strong> <span id="vulnFile"></span></p>
+                <p><strong>Line:</strong> <span id="vulnLine"></span></p>
+                <p><strong>Endpoint:</strong> <span id="vulnEndpoint"></span></p>
+            </div>
+            
+            <div class="detail-section">
+                <h3>Vulnerable Code</h3>
+                <div class="code-block" id="vulnCode"></div>
+            </div>
+            
+            <div class="detail-section">
+                <h3>Solution</h3>
+                <ol class="solution-steps" id="vulnSolution"></ol>
+            </div>
+            
+            <div class="detail-section">
+                <h3>References</h3>
+                <ul id="vulnReferences"></ul>
+            </div>
+            
+            <div class="detail-section">
+                <h3>Remediation</h3>
+                <div class="form-group">
+                    <label class="form-label">Assign to</label>
+                    <select class="form-control">
+                        <option>Security Team</option>
+                        <option>Development Team</option>
+                        <option>DevOps Team</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Priority</label>
+                    <select class="form-control">
+                        <option>Immediate</option>
+                        <option>High</option>
+                        <option>Medium</option>
+                        <option>Low</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Due Date</label>
+                    <input type="date" class="form-control">
+                </div>
+                <button class="btn btn-primary">Assign for Fixing</button>
+                <button class="btn btn-outline">Mark as False Positive</button>
+            </div>
+        </div>
+    </main>
+
+    <!-- Scanner Animation -->
+    <div class="scanner-line"></div>
+
+    <!-- JavaScript -->
+    <script src="js/main.js"></script>
+    
+    <script>
+        // Vulnerability data
+        const vulnerabilities = {
+            sqli: {
+                title: "SQL Injection",
+                description: "The application does not properly sanitize user input in SQL queries, allowing attackers to execute arbitrary SQL commands.",
+                impact: "Critical - Can lead to complete database compromise",
+                file: "/api/login.php",
+                line: "45",
+                endpoint: "POST /api/login",
+                code: `$username = $_POST['username'];\n$password = $_POST['password'];\n$sql = "SELECT * FROM users WHERE username='$username' AND password='$password';";`,
+                solution: [
+                    "Use prepared statements with parameterized queries",
+                    "Implement input validation and sanitization",
+                    "Use stored procedures",
+                    "Apply the principle of least privilege to database accounts"
+                ],
+                references: [
+                    "OWASP SQL Injection Prevention Cheat Sheet",
+                    "CWE-89: Improper Neutralization of Special Elements used in an SQL Command"
+                ]
+            },
+            xss: {
+                title: "Cross-Site Scripting (XSS)",
+                description: "User input is directly reflected in the response without proper encoding, allowing injection of malicious scripts.",
+                impact: "High - Can lead to session hijacking and credential theft",
+                file: "/search.php",
+                line: "32",
+                endpoint: "GET /search?q=",
+                code: `echo "<h3>Search Results for: " . $_GET['q'] . "</h3>";`,
+                solution: [
+                    "Implement output encoding",
+                    "Use Content Security Policy (CSP) headers",
+                    "Validate and sanitize all user input",
+                    "Use secure frameworks that auto-escape output"
+                ],
+                references: [
+                    "OWASP XSS Prevention Cheat Sheet",
+                    "CWE-79: Improper Neutralization of Input During Web Page Generation"
+                ]
+            },
+            rce: {
+                title: "Remote Code Execution",
+                description: "The file upload functionality does not validate file types, allowing upload and execution of malicious files.",
+                impact: "Critical - Can lead to complete server compromise",
+                file: "/upload.php",
+                line: "67",
+                endpoint: "POST /upload",
+                code: `$target_file = $target_dir . basename($_FILES["file"]["name"]);\nmove_uploaded_file($_FILES["file"]["tmp_name"], $target_file);`,
+                solution: [
+                    "Implement strict file type validation",
+                    "Store uploaded files outside web root",
+                    "Use random file names",
+                    "Scan uploaded files for malware",
+                    "Disable execution in upload directory"
+                ],
+                references: [
+                    "OWASP File Upload Cheat Sheet",
+                    "CWE-434: Unrestricted Upload of File with Dangerous Type"
+                ]
+            },
+            csrf: {
+                title: "CSRF Vulnerability",
+                description: "The application does not implement CSRF tokens, allowing attackers to perform actions on behalf of authenticated users.",
+                impact: "Medium - Can lead to unauthorized actions",
+                file: "/admin/update.php",
+                line: "",
+                endpoint: "POST /admin/update",
+                code: `// No CSRF token validation\nif ($_SESSION['admin']) {\n    // Perform admin action\n}`,
+                solution: [
+                    "Implement CSRF tokens for all state-changing operations",
+                    "Use SameSite cookie attribute",
+                    "Implement double-submit cookie pattern",
+                    "Require re-authentication for sensitive actions"
+                ],
+                references: [
+                    "OWASP CSRF Prevention Cheat Sheet",
+                    "CWE-352: Cross-Site Request Forgery"
+                ]
+            },
+            info: {
+                title: "Information Disclosure",
+                description: "The server reveals sensitive information through error messages and HTTP headers.",
+                impact: "Low - Can aid attackers in reconnaissance",
+                file: "HTTP Headers",
+                line: "",
+                endpoint: "All endpoints",
+                code: `Server: Apache/2.4.29 (Ubuntu)\nX-Powered-By: PHP/7.2.24`,
+                solution: [
+                    "Disable detailed error messages in production",
+                    "Remove unnecessary HTTP headers",
+                    "Use generic error messages",
+                    "Implement custom error pages"
+                ],
+                references: [
+                    "OWASP Information Disclosure",
+                    "CWE-200: Exposure of Sensitive Information to an Unauthorized Actor"
+                ]
+            }
+        };
+
+        function filterVulns(filter) {
+            // Update filter chips
+            document.querySelectorAll('.filter-chip').forEach(chip => {
+                chip.classList.remove('active');
+            });
+            event.currentTarget.classList.add('active');
+            
+            // Filter table rows
+            const rows = document.querySelectorAll('.vuln-row');
+            rows.forEach(row => {
+                if (filter === 'all' || row.classList.contains(filter)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        }
+
+        function showVulnDetails(vulnId) {
+            const vuln = vulnerabilities[vulnId];
+            if (!vuln) return;
+            
+            document.getElementById('vulnTitle').textContent = vuln.title;
+            document.getElementById('vulnDescription').textContent = vuln.description;
+            document.getElementById('vulnImpact').textContent = vuln.impact;
+            document.getElementById('vulnFile').textContent = vuln.file;
+            document.getElementById('vulnLine').textContent = vuln.line;
+            document.getElementById('vulnEndpoint').textContent = vuln.endpoint;
+            document.getElementById('vulnCode').textContent = vuln.code;
+            
+            const solutionList = document.getElementById('vulnSolution');
+            solutionList.innerHTML = '';
+            vuln.solution.forEach(step => {
+                const li = document.createElement('li');
+                li.textContent = step;
+                solutionList.appendChild(li);
+            });
+            
+            const refList = document.getElementById('vulnReferences');
+            refList.innerHTML = '';
+            vuln.references.forEach(ref => {
+                const li = document.createElement('li');
+                li.innerHTML = `<a href="#" style="color: var(--primary);">${ref}</a>`;
+                refList.appendChild(li);
+            });
+            
+            document.getElementById('vulnDetails').classList.add('active');
+            document.getElementById('vulnDetails').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function hideVulnDetails() {
+            document.getElementById('vulnDetails').classList.remove('active');
+        }
+
+        // Search functionality
+        document.getElementById('searchVulns').addEventListener('input', function(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            const rows = document.querySelectorAll('.vuln-row');
+            
+            rows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                if (text.includes(searchTerm)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        });
+    </script>
+</body>
+</html>
